@@ -1,6 +1,6 @@
-# Team Name
+# Aspiring Chillers
 
-### Team Members
+### Keegan Trevillian, Michael Grosspietsch
 
 ### Final Proposal
 1. Persona/Scenario
