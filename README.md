@@ -32,6 +32,8 @@ UNHCR.gov, wrapsnet.org
 
 3. Wireframes
 
+![readme1](https://github.com/keegan-trevill/TrevGros_2024_Final_Project/assets/117098956/74eb53ec-c07d-45eb-8a22-bce0d2ea726a)
+![readme2](https://github.com/keegan-trevill/TrevGros_2024_Final_Project/assets/117098956/aa7812f1-8f2c-4763-bd5e-7402cba38594)
 
 
 
