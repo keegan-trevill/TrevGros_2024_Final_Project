@@ -305,6 +305,8 @@ function dropdownChange() {
 
             // Create the new GeoJSON layer based on the selected attribute
             geojsonLayer = createPropSymbols(json, attributes);
+
+             
         });
 }
 document.getElementById("attributeDropdown").addEventListener("change", dropdownChange);
@@ -475,16 +477,19 @@ function pointToLayerUS(feature, latlng, attributes){
 
 
 
-function createPropSymbols(data, attributes){
-    //create a Leaflet GeoJSON layer and add it to the map
-    L.geoJson(data, {
-        pointToLayer: function(feature, latlng){
-            
+// Function to create the GeoJSON layer and assign it to geojsonLayer
+function createPropSymbols(json, attributes) {
+    var newGeojsonLayer = L.geoJson(json, {
+        pointToLayer: function(feature, latlng) {
             return pointToLayer(feature, latlng, attributes);
-            
         }
-    }).addTo(map);
-};
+    });
+
+    // Add the new GeoJSON layer to the map
+    newGeojsonLayer.addTo(map);
+
+    return newGeojsonLayer; // Return the newly created GeoJSON layer
+}
 
 function createPropSymbolsUS(data, attributes){
     //create a Leaflet GeoJSON layer and add it to the map
