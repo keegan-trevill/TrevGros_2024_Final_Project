@@ -5,7 +5,7 @@ var geojsonLayer;
 var dataStats = {}; 
 var dataStatsUS= {};
 //create an attributes array
-var attributes = ["Refugees", "Asylum"];
+var attributes = ["Refugees", "Asylum", "total"];
 
 
 
@@ -27,6 +27,8 @@ function createMap(){
     //call getData function
     getData(map);
 };
+
+
 function processDataRef(data) {
    var attributes = [];
 
@@ -252,28 +254,7 @@ var average = total / features.length;
 }
 
 
-function getData(map){
-    //load the data
-    
-    fetch("data/UsDataSIV.geojson")
-    .then(function(response){
-        return response.json();
-    })
-    .then(function(json){
-        //create an attributes array
-       var attributesUS = processDataUS(json);
-       calcStatsUS(json); 
-       createPropSymbolsUS(json, attributesUS);
-       //createSequenceControlsUS(attributesUS);
-    })
-    fetch("data/geoBoundaries-AFG-ADM0_simplified.geojson")
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        L.geoJSON(data).addTo(map);
-    })
-};
+
 
 // Define a function to handle the change event of the dropdown menu
 function dropdownChange() {
@@ -281,7 +262,15 @@ function dropdownChange() {
     var selectedAttribute = document.getElementById("attributeDropdown").value;
     console.log(selectedAttribute)
     // Fetch the GeoJSON data
-    fetch("data/2021WorldData.geojson")
+    var worldDataURL = "data/2021WorldData.geojson";
+    var USDataURL = "data/USDataSIV.geojson";
+    var fetchURL;
+    if (selectedAttribute === "total") {
+        fetchURL = USDataURL;
+    } else {
+        fetchURL = worldDataURL;
+    }
+    fetch(fetchURL)
         .then(function(response) {
             return response.json();
         })
@@ -296,6 +285,9 @@ function dropdownChange() {
                 attributes = processDataAsylum(json);
                 calcStatsAsylum(json);
                 
+            }  else if (selectedAttribute === "total") {
+                attributes = processDataUS(json);
+                calcStatsUS(json);
             }
 
             // If a previous GeoJSON layer exists, remove it from the map
@@ -315,23 +307,40 @@ document.getElementById("attributeDropdown").addEventListener("change", dropdown
 //calculate the radius of each proportional symbol
 function calcPropRadius(attValue) {
     // Define a maximum radius to cap the symbol sizes
-    var maxRadius = 30; // You can adjust this value based on your preference
+    var maxRadius = 30; 
+    var minRadius = 5// You can adjust this value based on your preference
     console.log(attValue)
     // Scale the attribute value to fit within a reasonable range
     var scaledValue = attValue / 1490562; // Assuming you have maxValue calculated elsewhere
 
     // Cap the scaled value to ensure it doesn't exceed 1
     scaledValue = Math.min(scaledValue, 1);
-
+    console.log(scaledValue * maxRadius)
     // Calculate the radius using a linear interpolation
-    var radius = scaledValue * maxRadius;
-
+    
+    var radius;
+    if(attValue < 10000 && attValue > 1000){
+        radius = scaledValue * maxRadius + 5
+    }else if (attValue < 1000){
+        radius = scaledValue * maxRadius
+    }
+    else if(attValue > 10000 && attValue< 150000){
+        radius = scaledValue * maxRadius + 10
+    }
+    else if(attValue > 150000 && attValue< 200000){
+        radius = scaledValue * maxRadius + 20
+    }
+    else {
+        radius = maxRadius;
+    }
     return radius;
+    
 }
 
 function calcPropRadiusAsylum(attValue) {
     // Define a maximum radius to cap the symbol sizes
-    var maxRadius = 30; // You can adjust this value based on your preference
+    var maxRadius = 30;
+    var minRadius = 5 // You can adjust this value based on your preference
     console.log(attValue)
     // Scale the attribute value to fit within a reasonable range
     var scaledValue = attValue / 43964; // Assuming you have maxValue calculated elsewhere
@@ -340,14 +349,29 @@ function calcPropRadiusAsylum(attValue) {
     scaledValue = Math.min(scaledValue, 1);
 
     // Calculate the radius using a linear interpolation
-    var radius = scaledValue * maxRadius;
-
+    var radius;
+    if(attValue < 1000){
+        radius = scaledValue * maxRadius 
+    }
+    else if(attValue >= 1000 && attValue < 2000){
+        radius = scaledValue * maxRadius + 3
+    }
+    else if (attValue >= 2000 && attValue < 40000){
+        radius = scaledValue * maxRadius + 7
+    }
+    else if (attValue >= 40000 && attValue < 100000){
+        radius = scaledValue * maxRadius + 1
+    }
+    else {
+        radius =scaledValue * maxRadius + 20;
+    }
     return radius;
 }
 
 function calcPropRadiusUS(attValue) {
     // Define a maximum radius to cap the symbol sizes
-    var maxRadius = 30; // You can adjust this value based on your preference
+    var maxRadius = 30;
+    var minRadius = 5 // You can adjust this value based on your preference
 
     // Scale the attribute value to fit within a reasonable range
     var scaledValue = attValue / 1649; // Assuming you have maxValue calculated elsewhere
@@ -356,7 +380,7 @@ function calcPropRadiusUS(attValue) {
     scaledValue = Math.min(scaledValue, 1);
 
     // Calculate the radius using a linear interpolation
-    var radius = scaledValue * maxRadius;
+    var radius = scaledValue * maxRadius ;
 
     return radius;
 }
@@ -433,7 +457,7 @@ function pointToLayer(feature, latlng, attributes){
         offset: new L.Point(0,-options.radius)
     });
 
-
+    
     //return the circle marker to the L.geoJson pointToLayer option
     return layer;
 };
@@ -479,26 +503,30 @@ function pointToLayerUS(feature, latlng, attributes){
 
 // Function to create the GeoJSON layer and assign it to geojsonLayer
 function createPropSymbols(json, attributes) {
-    var newGeojsonLayer = L.geoJson(json, {
-        pointToLayer: function(feature, latlng) {
-            return pointToLayer(feature, latlng, attributes);
-        }
-    });
-
+    console.log(attributes)
+    if (attributes == 'total') {
+        // Handle the case where 'total' attribute is selected
+        newGeojsonLayer = L.geoJson(json, {
+            pointToLayer: function(feature, latlng) {
+                return pointToLayerUS(feature, latlng, attributes);
+            }
+        });
+    }
+    else {
+        // Handle other attributes ('Refugees' and 'Asylum')
+        newGeojsonLayer = L.geoJson(json, {
+            pointToLayer: function(feature, latlng) {
+                return pointToLayer(feature, latlng, attributes);
+            }
+        });
+    }
     // Add the new GeoJSON layer to the map
     newGeojsonLayer.addTo(map);
 
     return newGeojsonLayer; // Return the newly created GeoJSON layer
 }
 
-function createPropSymbolsUS(data, attributes){
-    //create a Leaflet GeoJSON layer and add it to the map
-    L.geoJson(data, {
-        pointToLayer: function(feature, latlng){
-            return pointToLayerUS(feature, latlng, attributes);
-        }
-    }).addTo(map);
-};
+
 
 function PopupContentUS(properties, attribute){
     this.properties = properties;
