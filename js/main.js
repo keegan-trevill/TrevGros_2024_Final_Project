@@ -171,8 +171,6 @@ function processDataRef(data) {
             }
         }
     });
-
-    console.log(attributes);
     return attributes;
 }
 
@@ -189,7 +187,6 @@ function processDataAsylum(data) {
         }
     });
 
-    console.log(attributes);
     return attributes;
 }
 
@@ -205,7 +202,7 @@ function processDataUS(data) {
             }
     });
 
-    console.log(attributes);
+
     return attributes;
 }
 
@@ -224,7 +221,6 @@ function calcStatsRef(data){
         // For example:
         var name = properties.Country;
         var refugees = properties.Refugees;
-        console.log("Refugees:" + refugees + ", " + "Country: " + name)
     var allValues = [];
     
     if (refugees < minRefugees) {
@@ -257,9 +253,6 @@ var averageRefugees = totalRefugees / features.length;
     dataStats.min = 0;
     dataStats.max = 1490562;
     dataStats.mean = 27682
-    console.log("Minimum:", minRefugees);
-    console.log("Maximum:", maxRefugees);
-    console.log("Mean:", averageRefugees);
     return dataStats;
 
 });    
@@ -281,7 +274,6 @@ function calcStatsAsylum(data){
         // For example:
         var name = properties.Country;
         var asylum = properties.Asylum;
-        console.log("Asylum:" + asylum + ", " + "Country: " + name)
     var allValues = [];
     
     if (asylum < minAsylum) {
@@ -315,9 +307,6 @@ var averageAsylum = totalAsylum / features.length;
     dataStats.min = 0;
     dataStats.max = 43964;
     dataStats.mean = averageAsylum
-    console.log("Minimum:", minAsylum);
-    console.log("Maximum:", maxAsylum);
-    console.log("Mean:", averageAsylum);
     return dataStats;
 
 });    
@@ -339,7 +328,6 @@ function calcStatsUS(data){
         // For example:
         var name = properties.state;
         var totalSIV = properties.total;
-        console.log("total:" + totalSIV + ", " + "States: " + name)
     var allValues = [];
     
     if (totalSIV < min) {
@@ -373,9 +361,6 @@ var average = total / features.length;
     dataStatsUS.min = 5;
     dataStatsUS.max = 1649;
     dataStatsUS.mean = average
-    console.log("MinimumUS:", min);
-    console.log("MaximumUS:", max);
-    console.log("MeanUS:", average);
     return dataStatsUS;
 
 });    
@@ -389,7 +374,6 @@ var average = total / features.length;
 function dropdownChange() {
     // Get the selected attribute from the dropdown menu
     var selectedAttribute = document.getElementById("attributeDropdown").value;
-    console.log(selectedAttribute)
     // Fetch the GeoJSON data
     var worldDataURL = "data/2021WorldData.geojson";
     var USDataURL = "data/USDataSIV.geojson";
@@ -505,8 +489,6 @@ function pointToLayerAsylum(feature, latlng, attributes){
         var attribute = attributes[1];
         var attValue = Number(feature.properties[attribute]);
         var radius = calcPropRadius(attValue); // Calculate the radius based on the attribute value
-        //check
-        console.log(feature);
     //create marker options
     var options = {
         fillColor: "#b2182b",
@@ -570,8 +552,6 @@ function pointToLayerUS(feature, latlng, attributes){
     //Determine which attribute to visualize with proportional symbols
         //Step 4: Assign the current attribute based on the first index of the attributes array
         var attribute = attributes[0];
-        //check
-        console.log(attribute);
     //create marker options
     var options = {
         fillColor: "#00008B",
@@ -584,7 +564,6 @@ function pointToLayerUS(feature, latlng, attributes){
     
     //For each feature, determine its value for the selected attribute
     var attValue = Number(feature.properties[attribute]);
-    console.log(attValue)
 
     //Give each feature's circle marker a radius based on its attribute value
     options.radius = calcPropRadiusUS(attValue);
@@ -608,7 +587,6 @@ function pointToLayerUS(feature, latlng, attributes){
 
 // Function to create the GeoJSON layer and assign it to geojsonLayer
 function createPropSymbols(json, attributes) {
-    console.log(attributes)
     if (attributes == 'total') {
         // Handle the case where 'total' attribute is selected
         newGeojsonLayer = L.geoJson(json, {
