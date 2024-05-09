@@ -26,7 +26,49 @@ function createMap(){
     }).addTo(map)
     //call getData function
     getData(map);
+
+     // Create a container div for the paragraph and box
+     var container = document.createElement('div');
+     container.style.position = 'absolute';
+     container.style.bottom = '20px';
+     container.style.left = '70px';
+     container.style.zIndex = '1000'; // Ensure the container is layered over the map
+     map.getContainer().appendChild(container);
+ 
+     // Add a box with white background at 0.7 opacity
+     var box = document.createElement('div');
+     box.style.backgroundColor = 'rgba(255, 255, 255, 0.7)'; // White background at 0.7 opacity
+     box.style.padding = '10px';
+     box.style.borderRadius = '5px';
+     container.appendChild(box);
+
+    // Add a close button inside the box
+    var closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.style.float = 'right';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = function() {
+        // Call the close function when the close button is clicked
+        closeParagraphBox(container);
+    };
+    box.appendChild(closeButton);
+
+    // Add a paragraph to the bottom left of the map
+    var paragraph = document.createElement('p');
+    paragraph.textContent = "Welcome to the World Map showcasing the Afghan Diaspora in 2021! First we want to go over some definitions;"+
+    "'Asylum Seeker' refers to someone who is approaching a country purely for the purpose of escaping a hostile environment. \n"+
+    "'Refugee' is a legal title that is above asylum seeker in terms of protections. Asylum seekers will apply for refugee status and depending on which countries"+
+    " are receptive will grant the refugee status. \n";
+    paragraph.style.maxWidth = '300px'; // Set maximum width for the paragraph
+    paragraph.style.wordWrap = 'break-word'; // Allow words to break and wrap
+    box.appendChild(paragraph);
+
 };
+
+// Function to close the paragraph box
+function closeParagraphBox(container) {
+    container.parentNode.removeChild(container);
+}
 
 function getData(map){
 
@@ -571,11 +613,16 @@ function zoomToPakistanAndIran() {
     var narrativeContent = "Pakistan shows the highest refugee count in 2021 with 1,490,562. Iran is the second most with " + 
     "778,054. Iran is most similar to Afghanistan in terms of language and culture, but Pakistan tends to be more receptive to" 
     + " Afghan refugees that Iran. ";
+    
+   
     openNarrativeBox(narrativeContent);
     
-
+    
     // Fit the map view to the bounds of Pakistan and Iran
     map.fitBounds(pakistanIranBounds);
+    // Function to close the paragraph box
+  
+        
 }
 
 // Add a click event listener to your arrow button (assuming it has an id="zoomButton")
@@ -612,7 +659,10 @@ function zoomToUSA() {
         [24.396308, -125.0], // Southwest coordinates
         [49.384358, -66.93457] // Northeast coordinates
     ];
-    var narrativeContent = "Zoomed to the USA.";
+    var narrativeContent = "The Special Immigration Visa (SIV) was created in 2009 to help Afghan and Iraqi individuals "+
+    " to come to the US as lawful permanent residents and obtain a greencard for assisting the US in their campaigns in the War On Terror."+
+    " Unfortunetly, there is a small cap on how many SIVs are accepted into the US, even during the US withdrawal in 2021 many SIV applications were"+
+    " denied.";
 
     // Open the narrative box with the specified content
     openNarrativeBox(narrativeContent);

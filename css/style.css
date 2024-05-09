@@ -85,9 +85,6 @@
     max-width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.hide {
-    opacity: 0; /* Fade out */
-}
 .close-btn {
     position: absolute;
     top: 10px;
