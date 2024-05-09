@@ -27,8 +27,73 @@ function createMap(){
     //call getData function
     getData(map);
 
-    
-     // Create a container div for the paragraph and box
+// Create a custom control for the title
+	var titleControl = L.control({ position: 'topleft' });
+
+	// Define the content and behavior of the title control
+	titleControl.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'leaflet-control leaflet-bar leaflet-no-border'); // Apply a custom class for no border
+
+
+		// Set the title content with custom styles
+		div.innerHTML = '<h1 style="color: #000000; background-color: #ffffff; padding: 15px; border: 2px solid #999999; border-radius: 2px; font-size: 28px; font-family: Georgia, sans-serif;">Afghan Diaspora in 2021</h1>';
+
+		return div;
+
+	};
+
+	// Add the title control to the map
+	titleControl.addTo(map);
+
+	// Move the default zoom control below the title
+	map.zoomControl.setPosition('topright');
+
+// Remove the default zoom control from the map
+map.removeControl(map.zoomControl);
+
+
+// Define legend content with placeholders for dynamic values and circles
+var legendContent = '<div class="legend">' +
+    '<h4>Legend</h4>' +
+    '<div><svg width="70" height="15"><circle cx="35" cy="7" r="5" fill="rgba(178, 24, 43, 1)" stroke="#000000" stroke-width="2" /></svg> Minimum</div>' +
+    '<div><svg width="70" height="35"><circle cx="35" cy="18" r="15" fill="rgba(178, 24, 43, 1)" stroke="#000000" stroke-width="2" /></svg> Mean</div>' +
+    '<div><svg width="70" height="65"><circle cx="35" cy="33" r="30" fill="rgba(178, 24, 43, 1)" stroke="#000000" stroke-width="2" /></svg>Maximum</div>' +
+    '</div>';
+
+
+// Create a Leaflet control for the legend
+	var legendControl = L.Control.extend({
+		options: {
+			position: 'bottomright' // Position the legend in the bottom left corner
+		},
+
+		onAdd: function (map) {
+			var div = L.DomUtil.create('div', 'info legend'); // Create a custom container
+
+			// Add CSS styles to the legend
+			div.style.color = '#000000';
+			div.style.backgroundColor = '#ffffff';
+			div.style.padding = '30px';
+			div.style.border = '2px solid #999999';
+			div.style.borderRadius = '2px';
+			div.style.fontSize = '16px';
+			div.style.fontFamily = 'Georgia, sans-serif'
+			div.style.opacity = '0.8';
+
+			// Set the legend content
+			div.innerHTML = legendContent;
+
+			return div;
+		}
+	});
+
+
+// Create an instance of the legend control and add it to the map
+var legend = new legendControl();
+map.addControl(legend);
+
+
+// Create a container div for the paragraph and box
      var container = document.createElement('div');
      container.style.position = 'absolute';
      container.style.bottom = '20px';
@@ -169,7 +234,6 @@ function calcStatsRef(data){
         maxRefugees = refugees;
     } 
     totalRefugees += refugees;
-
 
 // Calculate average
 var averageRefugees = totalRefugees / features.length;
@@ -445,7 +509,7 @@ function pointToLayerAsylum(feature, latlng, attributes){
         console.log(feature);
     //create marker options
     var options = {
-        fillColor: "#ff7800",
+        fillColor: "#b2182b",
         color: "#000",
         weight: 1,
         opacity: 1,
@@ -485,7 +549,7 @@ function pointToLayer(feature, latlng, attributes) {
 
     // Initial marker options
     var options = {
-        fillColor: "#ff7800",  // Default fill color
+        fillColor: "#b2182b",  // Default fill color
         color: "#000",         // Default border color
         weight: 1,
         opacity: 1,
