@@ -28,6 +28,17 @@ function createMap(){
     getData(map);
 };
 
+function getData(map){
+
+    fetch("data/geoBoundaries-AFG-ADM0_simplified.geojson")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        L.geoJSON(data).addTo(map);
+    })
+};
+
 
 function processDataRef(data) {
    var attributes = [];
@@ -557,8 +568,11 @@ function zoomToPakistanAndIran() {
         [24.0, 60.0], // Southwest coordinates (Pakistan)
         [39.0, 77.0]  // Northeast coordinates (Iran)
     ];
-    var narrativeContent = "Zoomed to surrounding countries.";
+    var narrativeContent = "Pakistan shows the highest refugee count in 2021 with 1,490,562. Iran is the second most with " + 
+    "778,054. Iran is most similar to Afghanistan in terms of language and culture, but Pakistan tends to be more receptive to" 
+    + " Afghan refugees that Iran. ";
     openNarrativeBox(narrativeContent);
+    
 
     // Fit the map view to the bounds of Pakistan and Iran
     map.fitBounds(pakistanIranBounds);
@@ -579,7 +593,10 @@ function zoomToGermany() {
         [39.7986609345133, -9.31640625], // Southwest coordinates
         [61.60639637138628, 27.421875] // Northeast coordinates
     ];
-    var narrativeContent = "Zoomed to Germany.";
+    var narrativeContent = "Europe is known for Asylum seekers. Turkey takes in many refugees given its proximity to the Middle East" +
+    " and its ability to coordinate with the rest of Europe to find a permanent living situation for asylum seekers. Germany is a popular hub "+
+    "especially for Afghan asylum seekers given the US has its main military infrastructure in Germany, so the US is able to " +
+    "Move people to Germany easier than move people to the US.";
     openNarrativeBox(narrativeContent);
     // Fit the map view to the bounds of Germany
     map.fitBounds(germanyBounds);
