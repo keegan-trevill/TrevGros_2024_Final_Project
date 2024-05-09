@@ -35,42 +35,7 @@
     float: left;  
     
 }
-.legend-control-container {
-    background-color: rgba(255,255,255,0.8);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    max-height: auto; 
-    max-width: 400px; /* Adjust as needed */
-}
 
-/* Style for legend title */
-.legend-title {
-    font-weight: normal;
-    margin-bottom: 5px;
-}
-
-/* Style for legend items */
-.legend-item {
-    margin-bottom: 5px;
-}
-
-/* Style for legend item color squares */
-.legend-color {
-    width: 10px;
-    height: 10px;
-    display: inline-block;
-    margin-right: 5px;
-    vertical-align: middle;
-}
-
-/* Style for legend item labels */
-.legend-label {
-    display: inline-block;
-    vertical-align: middle;
-}
 .narrative-box {
     display: none;
     position: fixed;
@@ -93,4 +58,9 @@
 }
 #zoomToWorldButton {
     display: none; /* Hide button initially */
+}
+
+/*style for title*/
+.leaflet-no-border {
+    border: none !important; /* Remove default Leaflet border */
 }
