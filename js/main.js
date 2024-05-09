@@ -27,6 +27,7 @@ function createMap(){
     //call getData function
     getData(map);
 
+    
      // Create a container div for the paragraph and box
      var container = document.createElement('div');
      container.style.position = 'absolute';
@@ -55,10 +56,11 @@ function createMap(){
 
     // Add a paragraph to the bottom left of the map
     var paragraph = document.createElement('p');
-    paragraph.textContent = "Welcome to the World Map showcasing the Afghan Diaspora in 2021! First we want to go over some definitions;"+
+    paragraph.textContent = "Welcome to the World Map showcasing the Afghan Diaspora in 2021! First we want to go over some definitions. "+
     "'Asylum Seeker' refers to someone who is approaching a country purely for the purpose of escaping a hostile environment. \n"+
     "'Refugee' is a legal title that is above asylum seeker in terms of protections. Asylum seekers will apply for refugee status and depending on which countries"+
-    " are receptive will grant the refugee status. \n";
+    " are receptive will grant the refugee status. Use the dropdown Menu to switch between refugee, asylum seeker and SIV recipients or "+
+    "click on the buttons to zoom into an area of interest!";
     paragraph.style.maxWidth = '300px'; // Set maximum width for the paragraph
     paragraph.style.wordWrap = 'break-word'; // Allow words to break and wrap
     box.appendChild(paragraph);
@@ -77,7 +79,17 @@ function getData(map){
         return response.json();
     })
     .then(function(data) {
-        L.geoJSON(data).addTo(map);
+        L.geoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: '#000000', // color of the border
+                    weight: 2,        // thickness of the border
+                    opacity: 1,       // opacity of the border
+                    fillColor: '#fffcf5', // color inside the border
+                    fillOpacity: 0.5  // opacity inside the border
+                };
+            }
+        }).addTo(map);
     })
 };
 
@@ -333,14 +345,16 @@ function dropdownChange() {
             if (selectedAttribute === "Refugees") {
                 attributes = processDataRef(json);
                 calcStatsRef(json);
+                zoomToPakistanAndIran();
                 
             } else if (selectedAttribute === "Asylum") {
                 attributes = processDataAsylum(json);
                 calcStatsAsylum(json);
-                
+                zoomToGermany();
             }  else if (selectedAttribute === "total") {
                 attributes = processDataUS(json);
                 calcStatsUS(json);
+                zoomToUSA();
             }
 
             // If a previous GeoJSON layer exists, remove it from the map
@@ -357,91 +371,76 @@ function dropdownChange() {
 document.getElementById("attributeDropdown").addEventListener("change", dropdownChange);
 
 
-//calculate the radius of each proportional symbol
 function calcPropRadius(attValue) {
-    // Define a maximum radius to cap the symbol sizes
-    var maxRadius = 30; 
-    var minRadius = 5// You can adjust this value based on your preference
-    console.log(attValue)
-    // Scale the attribute value to fit within a reasonable range
-    var scaledValue = attValue / 1490562; // Assuming you have maxValue calculated elsewhere
+    // Define a maximum and minimum radius
+    var maxRadius = 30;
+    var minRadius = 3;
 
-    // Cap the scaled value to ensure it doesn't exceed 1
-    scaledValue = Math.min(scaledValue, 1);
-    console.log(scaledValue * maxRadius)
-    // Calculate the radius using a linear interpolation
+    // Logarithmic transformation
+    var minVal = 1;  // to avoid taking log of 0
+    var logValue = Math.log(Math.max(attValue, minVal));
+
+    // Normalize the log value to a scale of 0 to 1
+    var logMax = Math.log(1490562);  // Use the log of your max value in data
+    var normalizedValue = (logValue - Math.log(minVal)) / (logMax - Math.log(minVal));
+
+    // Scale to the range of radii
+    var radius = normalizedValue * (maxRadius - minRadius) + minRadius;
     
-    var radius;
-    if(attValue < 10000 && attValue > 1000){
-        radius = scaledValue * maxRadius + 5
-    }else if (attValue < 1000){
-        radius = scaledValue * maxRadius
-    }
-    else if(attValue > 10000 && attValue< 150000){
-        radius = scaledValue * maxRadius + 10
-    }
-    else if(attValue > 150000 && attValue< 200000){
-        radius = scaledValue * maxRadius + 20
-    }
-    else {
-        radius = maxRadius;
-    }
-    return radius;
-    
+     // Adjust color if attValue is zero
+     return radius;
 }
 
 function calcPropRadiusAsylum(attValue) {
-    // Define a maximum radius to cap the symbol sizes
+    // Define a maximum and minimum radius
     var maxRadius = 30;
-    var minRadius = 5 // You can adjust this value based on your preference
-    console.log(attValue)
-    // Scale the attribute value to fit within a reasonable range
-    var scaledValue = attValue / 43964; // Assuming you have maxValue calculated elsewhere
+    var minRadius = 3;
 
-    // Cap the scaled value to ensure it doesn't exceed 1
-    scaledValue = Math.min(scaledValue, 1);
+    // Logarithmic transformation
+    var minVal = 1;  // to avoid taking log of 0
+    var logValue = Math.log(Math.max(attValue, minVal));
 
-    // Calculate the radius using a linear interpolation
-    var radius;
-    if(attValue < 1000){
-        radius = scaledValue * maxRadius 
-    }
-    else if(attValue >= 1000 && attValue < 2000){
-        radius = scaledValue * maxRadius + 3
-    }
-    else if (attValue >= 2000 && attValue < 40000){
-        radius = scaledValue * maxRadius + 7
-    }
-    else if (attValue >= 40000 && attValue < 100000){
-        radius = scaledValue * maxRadius + 1
-    }
-    else {
-        radius =scaledValue * maxRadius + 20;
-    }
+    // Normalize the log value to a scale of 0 to 1
+    var logMax = Math.log(43964);  // Use the log of your max value in data
+    var normalizedValue = (logValue - Math.log(minVal)) / (logMax - Math.log(minVal));
+
+    // Scale to the range of radii
+    var radius = normalizedValue * (maxRadius - minRadius) + minRadius;
     return radius;
 }
 
 function calcPropRadiusUS(attValue) {
-    // Define a maximum radius to cap the symbol sizes
-    var maxRadius = 30;
-    var minRadius = 5 // You can adjust this value based on your preference
+    // Define a maximum and minimum radius
+    var maxRadius = 25;
+    var minRadius = 3;
 
-    // Scale the attribute value to fit within a reasonable range
-    var scaledValue = attValue / 1649; // Assuming you have maxValue calculated elsewhere
+    // Logarithmic transformation
+    var minVal = 1;  // to avoid taking log of 0
+    var logValue = Math.log(Math.max(attValue, minVal));
 
-    // Cap the scaled value to ensure it doesn't exceed 1
-    scaledValue = Math.min(scaledValue, 1);
+    // Normalize the log value to a scale of 0 to 1
+    var logMax = Math.log(1649);  // Use the log of your max value in data
+    var normalizedValue = (logValue - Math.log(minVal)) / (logMax - Math.log(minVal));
 
-    // Calculate the radius using a linear interpolation
-    var radius = scaledValue * maxRadius ;
-
+    // Scale to the range of radii
+    var radius = normalizedValue * (maxRadius - minRadius) + minRadius;
     return radius;
+}
+
+function handleZero(attValue, options) {
+    if (attValue == 0) {
+        options.fillColor = 'grey';  // Change fill color to grey if attribute value is zero
+        options.color = 'grey';      // Optionally change the border color to grey as well
+    }
+    return options;
 }
 
 function pointToLayerAsylum(feature, latlng, attributes){
     //Determine which attribute to visualize with proportional symbols
         //Step 4: Assign the current attribute based on the first index of the attributes array
         var attribute = attributes[1];
+        var attValue = Number(feature.properties[attribute]);
+        var radius = calcPropRadius(attValue); // Calculate the radius based on the attribute value
         //check
         console.log(feature);
     //create marker options
@@ -450,13 +449,17 @@ function pointToLayerAsylum(feature, latlng, attributes){
         color: "#000",
         weight: 1,
         opacity: 1,
-        fillOpacity: 0.8
+        fillOpacity: 0.8,
+        radius: radius
         
     };
+
+    // Adjust color if attribute value is zero
+    options = handleZero(attValue, options);
     
     //For each feature, determine its value for the selected attribute
     var attValue = Number(feature.properties[attribute]);
-
+    
     //Give each feature's circle marker a radius based on its attribute value
     options.radius = calcPropRadius(attValue);
 
@@ -475,45 +478,30 @@ function pointToLayerAsylum(feature, latlng, attributes){
     return layer;
 };
 
-function pointToLayer(feature, latlng, attributes){
-    //Determine which attribute to visualize with proportional symbols
-        //Step 4: Assign the current attribute based on the first index of the attributes array
-        var attribute = attributes[0];
-        //check
-        console.log(attributes[0]);
-    //create marker options
+function pointToLayer(feature, latlng, attributes) {
+    var attribute = attributes[0];  // This might need to be adjusted based on actual use
+    var attValue = Number(feature.properties[attribute]);
+    var radius = calcPropRadius(attValue); // Calculate the radius based on the attribute value
+
+    // Initial marker options
     var options = {
-        fillColor: "#ff7800",
-        color: "#000",
+        fillColor: "#ff7800",  // Default fill color
+        color: "#000",         // Default border color
         weight: 1,
         opacity: 1,
-        fillOpacity: 0.8
-        
+        fillOpacity: 0.8,
+        radius: radius
     };
-    
-    //For each feature, determine its value for the selected attribute
-    var attValue = Number(feature.properties[attribute]);
 
-    //Give each feature's circle marker a radius based on its attribute value
-    if(attributes[0] == 'Asylum'){
-        options.radius = calcPropRadiusAsylum(attValue);
-    }else if(attributes[0] == 'Refugees'){
-    options.radius = calcPropRadius(attValue);
-    }
-    //create circle marker layer
+    // Adjust color if attribute value is zero
+    options = handleZero(attValue, options);
+
+    // Create and return the circle marker
     var layer = L.circleMarker(latlng, options);
-
     var popupContent = new PopupContentWorld(feature.properties, attribute);
-
-    //bind the popup to the circle marker    
-    layer.bindPopup(popupContent.formatted, { 
-        offset: new L.Point(0,-options.radius)
-    });
-
-    
-    //return the circle marker to the L.geoJson pointToLayer option
+    layer.bindPopup(popupContent.formatted, { offset: new L.Point(0,-options.radius) });
     return layer;
-};
+}
 function pointToLayerUS(feature, latlng, attributes){
     //Determine which attribute to visualize with proportional symbols
         //Step 4: Assign the current attribute based on the first index of the attributes array
@@ -621,7 +609,10 @@ function zoomToPakistanAndIran() {
     // Fit the map view to the bounds of Pakistan and Iran
     map.fitBounds(pakistanIranBounds);
     // Function to close the paragraph box
-  
+    document.getElementById("zoomButton").style.display = 'none';
+    document.getElementById("zoomToWorldButton").style.display = 'block';
+    document.getElementById("zoomToUSButton").style.display = 'block';
+    document.getElementById("zoomToGermanyButton").style.display = 'block';
         
 }
 
@@ -647,6 +638,11 @@ function zoomToGermany() {
     openNarrativeBox(narrativeContent);
     // Fit the map view to the bounds of Germany
     map.fitBounds(germanyBounds);
+
+    document.getElementById("zoomToGermanyButton").style.display = 'none';
+    document.getElementById("zoomToWorldButton").style.display = 'block';
+    document.getElementById("zoomButton").style.display = 'block';
+    document.getElementById("zoomToUSButton").style.display = 'block';
 }
 
 // Add event listener to the button element
@@ -668,7 +664,31 @@ function zoomToUSA() {
     openNarrativeBox(narrativeContent);
     // Fit the map view to the bounds of the USA
     map.fitBounds(USBounds);
+    document.getElementById("zoomToUSButton").style.display = 'none';
+    document.getElementById("zoomToWorldButton").style.display = 'block';
+    document.getElementById("zoomButton").style.display = 'block';
+    document.getElementById("zoomToGermanyButton").style.display = 'block';
+    
 }
+    //Add event listener and code for zooming out
+    // Add event listener to the button element
+
+// Add event listener to the button element
+document.getElementById("zoomToWorldButton").addEventListener("click", zoomToWorldMap);
+
+// Function to handle zooming out to the world map
+function zoomToWorldMap() {
+    // Set the coordinates and zoom level for the entire world
+    map.setView([20, 0], 2);
+    document.getElementById("zoomToWorldButton").style.display = 'none';
+    document.getElementById("zoomToUSButton").style.display = 'block';
+    document.getElementById("zoomToGermanyButton").style.display = 'block';
+    document.getElementById("zoomButton").style.display = 'block';
+    closeNarrativeBox();
+}
+
+
+
 // Function to open the narrative box
 function openNarrativeBox(content) {
     var narrativeBox = document.getElementById('narrativeBox');

@@ -91,3 +91,6 @@
     right: 10px;
     cursor: pointer;
 }
+#zoomToWorldButton {
+    display: none; /* Hide button initially */
+}
