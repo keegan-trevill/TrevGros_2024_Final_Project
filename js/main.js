@@ -16,9 +16,14 @@ function createMap(){
         center: [20, 0],
         zoom: 2
     });
+	
+// Define your Stadia Maps API key
+var apiKey = '57ee498e-3518-4617-9ff3-6a58512c7d36';
 
-    //add OSM base tilelayer
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
+// Create a Stadia Maps tile layer with your API key
+var tileLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=' + apiKey, {
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> contributors'
+});
         minZoom: 0,
         maxZoom: 20,
         attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
